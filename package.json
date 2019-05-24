@@ -9,7 +9,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "webpack-dev-server",
-    "build": "webpack --config webpack-build-config.js"
+    "build": "webpack --config webpack-build.config.js",
+    "analyze": "webpack-bundle-analyzer dist/stats.json"
   },
   "dependencies": {
     "@babel/cli": "^7.4.4",

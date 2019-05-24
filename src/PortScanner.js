@@ -5,8 +5,6 @@ class PortScanner {
   constructor() {
     //initialize image pool
     this.imgs = new Array(10).fill().map(() => new Image());
-    this.enqueuedJobs = [];
-    this.eventEmitter = new EventEmitter();
   }
 
   // eslint-disable-next-line no-console
@@ -32,36 +30,25 @@ class PortScanner {
   }
 
   // eslint-disable-next-line no-console
-  scanPorts(ports, target, log = console.log) {
-    return new Promise((resolve, reject) => {
-      const openPorts = [];
-      let scannedPorts = 0;
+  async scanPorts(ports, target, log = console.log) {
+    const openPorts = [];
+    const tmpPorts = [...ports];
 
-      const listener = (target, port, open = false) => {
-        if (target !== target) {
-          //if this isn't a job scheduled by us, we don't care
-          return;
-        }
+    /* eslint-disable no-await-in-loop */
+    while (tmpPorts.length > 0) {
+      const results = await Promise.all(
+        tmpPorts
+          .splice(0, 10)
+          .map((port, index) =>
+            this.checkPortUsingImage(index, port, target, log)
+          )
+      );
 
-        if (open) {
-          openPorts.push(port);
-        }
+      openPorts.push(...results.filter(port => port !== null));
+    }
+    /* eslint-enable no-await-in-loop */
 
-        scannedPorts++;
-
-        if (scannedPorts >= ports.length) {
-          //we scanned all given ports
-          resolve(openPorts);
-        }
-      };
-
-      eventEmitter.on("scanned-port", listener);
-
-      //push all jobs
-      enqueuedJobs.push(ports.map(port => ({ target, port })));
-
-      return openPorts;
-    });
+    return openPorts;
   }
 
   // eslint-disable-next-line no-console

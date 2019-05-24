@@ -22,8 +22,8 @@ module.exports = {
   devtool: "nosources-source-map",
 
   output: {
-    path: path.join(context, "dist/client-build/"),
-    filename: "[name].[chunkhash].js",
+    path: path.join(context, "dist/"),
+    filename: "[name].js", //[name].[chunkhash].js
     publicPath: PUBLIC_PATH
   },
 
@@ -46,7 +46,6 @@ module.exports = {
             keep_fargs: false,
             pure_getters: true,
             collapse_vars: true,
-            warnings: false,
             sequences: true,
             dead_code: true,
             drop_debugger: true,
