@@ -38,6 +38,7 @@
 			display: table;
 			position: relative;
 			background: #021523;
+			overflow: hidden;
 		}
 		.radarbox .background{
 			position: absolute;
@@ -46,6 +47,46 @@
 			right: 0px;
 			bottom: 0px;
 		}
+		.radarbox .scan_wave {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		    height: 50px;
+		    width: 50px;
+		}
+
+		.radarbox .scan_wave:before, .radarbox .scan_wave:after {
+		    background: #032e4e;
+		    position:absolute;
+			content:'';
+			height:100px;
+			width:100px;
+			left: calc(50% - 50px);
+			top: calc(50% - 50px);
+			border-radius:50%;
+		}
+
+		.radarbox .scan_wave:before {
+		  animation: pulse 3.5s linear infinite;
+		}
+
+		.radarbox .scan_wave:after {
+		  animation: pulse 3.5s 1s linear infinite;
+		}
+
+		@keyframes pulse {
+		  0% {
+		    opacity:0.5;
+		    transform:scale(1);
+		  }
+		  
+		  100% {
+		    opacity:0;
+		    transform:scale(20);
+		  }
+		}
+
 
 		.radarbox .device {
 			position: absolute;
@@ -137,6 +178,7 @@
 		<h2>Use the debug console to follow the scan</h2>
 	</div>
 	<div class="radarbox">
+		<div class="scan_wave"></div>
 		<canvas id="spiders" class="background" width="1280" height="451"></canvas>
 		<div class="device dpos1 default">
 			<div class="device_img"></div>
