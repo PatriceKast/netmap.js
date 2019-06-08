@@ -2,24 +2,30 @@ import { commonHttpPorts, commonPorts } from "./PortDump";
 import EventEmitter from "event-emitter";
 
 class PortScanner {
-  constructor() {
+  log: (type: string, ...messages: string[]) => void;
+
+  imgs: HTMLImageElement[];
+
+  constructor({ log }) {
+    this.log = log;
+
     //initialize image pool
-    this.imgs = new Array(10).fill().map(() => new Image());
+    this.imgs = new Array(10).fill(null).map(() => new Image());
   }
 
   // eslint-disable-next-line no-console
-  async scan(target, light = false, log = console.log) {
-    log("device", `Scan: ${target}, light: ${light}`);
+  async scan(target: string, light = false) {
+    this.log("device", `Scan: ${target}, light: ${light}`);
 
-    const startTime = new Date();
+    const startTime = Date.now();
     const ports = light ? commonHttpPorts : commonPorts;
-    const res = await this.scanPorts(ports, target, log);
+    const res = await this.scanPorts(ports, target);
 
-    const endTime = new Date();
+    const endTime = Date.now();
     const ms = Math.round(endTime - startTime);
     const portsPerSecond = Math.round((ports.length / ms) * 1000);
 
-    log(
+    this.log(
       "device",
       `${ms} ms for scanning ${
         ports.length
@@ -30,8 +36,8 @@ class PortScanner {
   }
 
   // eslint-disable-next-line no-console
-  async scanPorts(ports, target, log = console.log) {
-    const openPorts = [];
+  async scanPorts(ports: number[], target: string) {
+    const openPorts: number[] = [];
     const tmpPorts = [...ports];
 
     /* eslint-disable no-await-in-loop */
@@ -52,13 +58,18 @@ class PortScanner {
   }
 
   // eslint-disable-next-line no-console
-  checkPortUsingImage(index, port, target, log = console.log, timeout = 500) {
+  checkPortUsingImage(
+    index: number,
+    port: number,
+    target: string,
+    timeout = 500
+  ) {
     if (timeout > 1000) {
       throw new Error("Timeouts larger than 1000ms shouldn't be used!");
     }
 
     return new Promise((resolve, reject) => {
-      log("ports", `Check Port //${target}:${port}`);
+      this.log("ports", `Check Port //${target}:${port}`);
       //var img = new Image();
 
       this.imgs[index].onerror = () => {

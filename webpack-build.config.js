@@ -23,7 +23,7 @@ module.exports = {
 
   output: {
     path: path.join(context, "dist/"),
-    filename: "[name].js", //[name].[chunkhash].js
+    filename: "[name].[chunkhash].js",
     publicPath: PUBLIC_PATH
   },
 
@@ -80,7 +80,7 @@ module.exports = {
 
   resolve: {
     modules: [path.resolve(context, "src"), "node_modules"],
-    extensions: [".js", ".jsx"],
+    extensions: [".js", ".ts"],
     alias: {
       //img: path.resolve(context, "img")
     }
@@ -101,6 +101,7 @@ module.exports = {
             options: {
               presets: [
                 [
+                  "@babel/typescript",
                   "@babel/preset-env",
                   {
                     targets: {
