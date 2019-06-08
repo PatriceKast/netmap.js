@@ -1,12 +1,12 @@
 export const getIp = () =>
   new Promise((resolve, reject) => {
     const ip_dups = {};
-    const RTCPeerConnection =
+    let RTCPeerConnection =
       window.RTCPeerConnection ||
       window.mozRTCPeerConnection ||
       window.webkitRTCPeerConnection;
 
-    const useWebKit = !!window.webkitRTCPeerConnection;
+    let useWebKit = !!window.webkitRTCPeerConnection;
 
     if (!RTCPeerConnection) {
       const win = document.querySelector(".iframe_webrtc").contentWindow;
