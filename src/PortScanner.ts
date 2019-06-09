@@ -45,9 +45,7 @@ class PortScanner {
       const results = await Promise.all(
         tmpPorts
           .splice(0, 10)
-          .map((port, index) =>
-            this.checkPortUsingImage(index, port, target, log)
-          )
+          .map((port, index) => this.checkPortUsingImage(index, port, target))
       );
 
       openPorts.push(...results.filter(port => port !== null));
@@ -63,33 +61,33 @@ class PortScanner {
     port: number,
     target: string,
     timeout = 500
-  ) {
+  ): Promise<number | null> {
     if (timeout > 1000) {
       throw new Error("Timeouts larger than 1000ms shouldn't be used!");
     }
 
     return new Promise((resolve, reject) => {
       this.log("ports", `Check Port //${target}:${port}`);
-      //var img = new Image();
+      const img = this.imgs[index];
 
-      this.imgs[index].onerror = () => {
-        //if (!img) return;
-        if (this.imgs[index].src == "http://localhost/") return;
-        //img = undefined;
-        this.imgs[index].src = "http://localhost/";
-        log("ports", `Open Port: //${target}:${port}`);
+      const callback = () => {
+        if (img.src === "http://localhost/") return;
+        img.src = "http://localhost/";
+
+        this.log("ports", `Open Port: //${target}:${port}`);
         resolve(port);
       };
 
-      this.imgs[index].onload = this.imgs[index].onerror;
-      this.imgs[index].src = "http://" + target + ":" + port;
+      img.onerror = callback;
+      img.onload = callback;
+
+      img.src = `http://${target}:${port}`;
 
       setTimeout(() => {
-        //if (!img) return;
-        if (this.imgs[index].src == "http://localhost/") return;
-        //img = undefined;
-        this.imgs[index].src = "http://localhost/";
-        //log(`Closed Port: //${target}:${port}`);
+        if (img.src === "http://localhost/") return;
+        img.src = "http://localhost/";
+
+        //this.log(`Closed Port: //${target}:${port}`);
         resolve(null);
       }, timeout);
     });

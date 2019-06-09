@@ -2,7 +2,7 @@
   "name": "port-scanner",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "author": {
     "name": "Patrice Kast"
   },

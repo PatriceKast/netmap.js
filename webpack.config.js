@@ -12,7 +12,7 @@ module.exports = {
 
   context,
 
-  entry: ["@babel/polyfill", path.join(context, "src/index.js")],
+  entry: ["@babel/polyfill", path.join(context, "src/index.ts")],
 
   output: {
     path: path.join(context, "dist/"),
@@ -45,7 +45,7 @@ module.exports = {
 
   resolve: {
     modules: [path.resolve(context, "src"), "node_modules"],
-    extensions: [".js", ".jsx", ".css", ".scss"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".scss"],
     alias: {
       //img: path.resolve(context, "img")
     }
@@ -54,7 +54,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(j|t)sx?$/,
         include: [path.resolve(context, "src")],
 
         use: [
@@ -70,7 +70,8 @@ module.exports = {
                       browsers: ["> 1%", "last 2 major versions"]
                     }
                   }
-                ]
+                ],
+                "@babel/typescript"
               ],
               plugins: [
                 "@babel/plugin-proposal-object-rest-spread",

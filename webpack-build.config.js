@@ -16,10 +16,10 @@ module.exports = {
   context,
 
   entry: {
-    index: ["@babel/polyfill", path.join(context, "src/index.js")]
+    index: ["@babel/polyfill", path.join(context, "src/index.ts")]
   },
 
-  devtool: "nosources-source-map",
+  devtool: "source-map",
 
   output: {
     path: path.join(context, "dist/"),
@@ -80,7 +80,7 @@ module.exports = {
 
   resolve: {
     modules: [path.resolve(context, "src"), "node_modules"],
-    extensions: [".js", ".ts"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".scss"],
     alias: {
       //img: path.resolve(context, "img")
     }
@@ -89,7 +89,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(j|t)sx?$/,
         include: [
           path.resolve(context, "src"),
           path.resolve(context, "node_modules")
@@ -101,7 +101,6 @@ module.exports = {
             options: {
               presets: [
                 [
-                  "@babel/typescript",
                   "@babel/preset-env",
                   {
                     targets: {
@@ -111,7 +110,8 @@ module.exports = {
                     forceAllTransforms: true
                     /*useBuiltIns: "entry"*/
                   }
-                ]
+                ],
+                "@babel/typescript"
               ],
               plugins: [
                 ["@babel/plugin-proposal-class-properties", { loose: false }],

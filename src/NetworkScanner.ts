@@ -1,5 +1,5 @@
 import PortScanner from "./PortScanner";
-import { getIp } from "./IPFetcher";
+import { getIps } from "./IPFetcher";
 import {
   getRangeFromIp,
   DEFAULT_GATEWAYS,
@@ -91,16 +91,19 @@ class NetworkScanner {
     /* eslint-enable no-await-in-loop */
   };
 
-  addLocalRange = async () => {
-    const ip = await getIp();
+  addLocalRanges = async () => {
+    const ips = await getIps();
 
-    if (ip != null) {
-      this.ranges.add(getRangeFromIp(ip));
+    for (const ip of ips) {
+      const range = getRangeFromIp(ip);
+
+      this.ranges.add(range);
+      this.log("info", `Added local range ${range} (via ${ip})`);
     }
   };
 
   scanNetwork = async () => {
-    await this.addLocalRange();
+    await this.addLocalRanges();
 
     this.log("info", "Testing gateways...");
     await this.testGateways(true);
