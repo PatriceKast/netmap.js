@@ -1,3 +1,5 @@
+import EventEmitter from "events";
+
 import PortScanner from "./PortScanner";
 import { getIps } from "./IPFetcher";
 import {
@@ -5,6 +7,8 @@ import {
   DEFAULT_GATEWAYS,
   DEFAULT_RANGES
 } from "./utilities/network";
+
+export type LoggingFunction = (type: string, ...messages: string[]) => void;
 
 const addPortsToSetMapping = (
   setMapping: { [key: string]: Set<number> },
@@ -22,7 +26,7 @@ const addPortsToSetMapping = (
 };
 
 class NetworkScanner {
-  log: (type: string, ...messages: string[]) => void;
+  log: LoggingFunction;
   portScanner: PortScanner;
 
   gateways: Set<string>;
@@ -31,9 +35,10 @@ class NetworkScanner {
   scannedIps: Set<string> = new Set(); //
   ipToPorts: { [key: string]: Set<number> } = {}; //maps all scanned ips to the found ports
 
+  eventEmitter: EventEmitter;
+
   /**
    * Creates a new instance of the class 'NetworkScanner'
-   * @param {Object} options The plugin options
    */
   constructor({
     log = console.log, // eslint-disable-line no-console
@@ -43,27 +48,79 @@ class NetworkScanner {
     this.log = log;
     this.gateways = new Set(gateways);
     this.ranges = new Set(ranges);
-    this.portScanner = new PortScanner({ log });
+    this.eventEmitter = new EventEmitter();
+    this.portScanner = new PortScanner({
+      eventEmitter: this.eventEmitter
+    });
+
+    if (this.log) {
+      this.on("scan-device:start", ({ ip }) =>
+        this.log("device", `Scanning ip ${ip}`)
+      );
+
+      this.on("scan-device:end", ({ ip, duration, ports, portsPerSecond }) =>
+        this.log(
+          "device",
+          `Done scanning ${ip}. It took ${duration} ms for scanning ${
+            ports.length
+          } ports, ${portsPerSecond} Ports / Sec`
+        )
+      );
+
+      this.on("scan-range:start", ({ range, light }) =>
+        this.log("info", `Scanning range ${range}, light: ${light}`)
+      );
+
+      this.on("scan-range:end", ({ range }) =>
+        this.log("info", `Done scanning range ${range}`)
+      );
+
+      this.on("add-local-range", ({ range, ip }) =>
+        this.log("info", `Added local range ${range} (via ${ip})`)
+      );
+
+      this.on("scan-gateways:start", () =>
+        this.log("info", "Testing gateways...")
+      );
+      this.on("scan-gateways:end", () =>
+        this.log("info", "Done testing gateways...")
+      );
+
+      this.on("scan-port:start", ({ ip, port }) =>
+        this.log("ports", `Check Port //${ip}:${port}`)
+      );
+      this.on(
+        "scan-port:end",
+        ({ ip, port, open }) =>
+          open && this.log("ports", `Open Port: //${ip}:${port}`)
+      );
+    }
   }
+
+  /**
+   * Makes the use of the eventEmitter easier
+   */
+  emit = (event: string, ...args: any[]) =>
+    this.eventEmitter.emit(event, ...args);
+  on = (event: string, listener: (...args: any[]) => void) =>
+    this.eventEmitter.on(event, listener);
+  off = (event: string, listener: (...args: any[]) => void) =>
+    this.eventEmitter.off(event, listener);
 
   /**
    * Scans the device with the given ip and pushes it the the passed ip array.
    * All open ports are added to ip
    */
-  scanDevice = async (ip, light = true) => {
-    this.log("device", `Scanning ip ${ip}`);
-
+  scanDevice = async (ip: string, light = true) => {
     const ports = await this.portScanner.scan(ip, light);
     addPortsToSetMapping(this.ipToPorts, ip, ports);
     this.scannedIps.add(ip);
-
-    this.log("device", `Done scanning ip ${ip}`);
 
     return ports;
   };
 
   scanRange = async (range, light = true) => {
-    this.log("info", `Scanning range ${range}, light: ${light}`);
+    this.emit("scan-range:start", { range, light });
 
     // All ips or devices have to be scanned sequentially
 
@@ -78,45 +135,53 @@ class NetworkScanner {
     }
     /* eslint-enable no-await-in-loop */
 
-    this.log("info", `Done scanning range ${range}`);
+    this.emit("scan-range:end", { range, light, scannedIps: this.scannedIps });
   };
 
   testGateways = async (light = true) => {
     // We again want to scan all the gateways sequentially
+    this.emit("scan-gateways:start", { light, gateways: this.gateways });
 
     /* eslint-disable no-await-in-loop */
     for (const gateway of this.gateways) {
       await this.scanDevice(gateway, light);
     }
     /* eslint-enable no-await-in-loop */
+
+    this.emit("scan-gateways:end", { light, gateway: this.gateways });
   };
 
   addLocalRanges = async () => {
+    this.emit("get-local-ips:start");
     const ips = await getIps();
+    this.emit("get-local-ips:end", { ips });
+
+    this.emit("add-local-ranges:start");
+    const localRanges = new Set<string>();
 
     for (const ip of ips) {
       const range = getRangeFromIp(ip);
 
-      this.ranges.add(range);
-      this.log("info", `Added local range ${range} (via ${ip})`);
+      this.emit("add-local-range", { range, ip });
+      localRanges.add(range);
     }
+
+    localRanges.forEach(range => this.ranges.add(range));
+    this.emit("add-local-ranges:end", { localRanges });
   };
 
   scanNetwork = async () => {
     await this.addLocalRanges();
-
-    this.log("info", "Testing gateways...");
     await this.testGateways(true);
-    this.log("info", "Done testing gateways...");
 
     // Usually doing awaits inside a loop is extremely inefficient but in this case we want
     // to sequentially scan them.
 
     /* eslint-disable no-await-in-loop */
-    for (const range in this.ranges) {
+    for (const range of this.ranges) {
       await this.scanRange(range, true);
     }
-    for (const range in this.ranges) {
+    for (const range of this.ranges) {
       await this.scanRange(range, false);
     }
     /* eslint-enable no-await-in-loop */

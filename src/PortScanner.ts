@@ -1,21 +1,32 @@
+import EventEmitter from "events";
+
 import { commonHttpPorts, commonPorts } from "./PortDump";
-import EventEmitter from "event-emitter";
 
 class PortScanner {
-  log: (type: string, ...messages: string[]) => void;
+  eventEmitter: EventEmitter;
 
   imgs: HTMLImageElement[];
 
-  constructor({ log }) {
-    this.log = log;
+  constructor({ eventEmitter }: { eventEmitter: EventEmitter }) {
+    this.eventEmitter = eventEmitter;
 
     //initialize image pool
     this.imgs = new Array(10).fill(null).map(() => new Image());
   }
 
+  /**
+   * Makes the use of the eventEmitter easier
+   */
+  emit = (event: string, ...args: any[]) =>
+    this.eventEmitter.emit(event, ...args);
+  on = (event: string, listener: (...args: any[]) => void) =>
+    this.eventEmitter.on(event, listener);
+  off = (event: string, listener: (...args: any[]) => void) =>
+    this.eventEmitter.off(event, listener);
+
   // eslint-disable-next-line no-console
   async scan(target: string, light = false) {
-    this.log("device", `Scan: ${target}, light: ${light}`);
+    this.emit("scan-device:start", { ip: target, light });
 
     const startTime = Date.now();
     const ports = light ? commonHttpPorts : commonPorts;
@@ -25,12 +36,15 @@ class PortScanner {
     const ms = Math.round(endTime - startTime);
     const portsPerSecond = Math.round((ports.length / ms) * 1000);
 
-    this.log(
-      "device",
-      `${ms} ms for scanning ${
-        ports.length
-      } ports on ${target}, ${portsPerSecond} Ports / Sec`
-    );
+    this.emit("scan-device:end", {
+      ip: target,
+      light,
+      startTime,
+      endTime,
+      duration: ms,
+      ports,
+      portsPerSecond
+    });
 
     return res;
   }
@@ -67,14 +81,15 @@ class PortScanner {
     }
 
     return new Promise((resolve, reject) => {
-      this.log("ports", `Check Port //${target}:${port}`);
+      this.emit("scan-port:start", { ip: target, port });
+
       const img = this.imgs[index];
 
       const callback = () => {
         if (img.src === "http://localhost/") return;
         img.src = "http://localhost/";
 
-        this.log("ports", `Open Port: //${target}:${port}`);
+        this.emit("scan-port:end", { ip: target, port, open: true });
         resolve(port);
       };
 
@@ -88,6 +103,7 @@ class PortScanner {
         img.src = "http://localhost/";
 
         //this.log(`Closed Port: //${target}:${port}`);
+        this.emit("scan-port:end", { ip: target, port, open: false });
         resolve(null);
       }, timeout);
     });
