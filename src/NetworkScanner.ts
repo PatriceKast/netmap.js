@@ -1,12 +1,8 @@
 import EventEmitter from "events";
 
-import PortScanner from "./PortScanner";
+import PortScanManager from "./PortScanManager";
 import { getIps } from "./IPFetcher";
-import {
-  getRangeFromIp,
-  DEFAULT_GATEWAYS,
-  DEFAULT_RANGES
-} from "./utilities/network";
+import { getRangeFromIp } from "./utilities/network";
 
 export type LoggingFunction = (type: string, ...messages: string[]) => void;
 
@@ -27,7 +23,7 @@ const addPortsToSetMapping = (
 
 class NetworkScanner {
   log: LoggingFunction;
-  portScanner: PortScanner;
+  portScanManager: PortScanManager;
 
   gateways: Set<string>;
   ranges: Set<string>;
@@ -42,14 +38,14 @@ class NetworkScanner {
    */
   constructor({
     log = console.log, // eslint-disable-line no-console
-    gateways = DEFAULT_GATEWAYS,
-    ranges = DEFAULT_RANGES
+    gateways = [],
+    ranges = []
   }) {
     this.log = log;
     this.gateways = new Set(gateways);
     this.ranges = new Set(ranges);
     this.eventEmitter = new EventEmitter();
-    this.portScanner = new PortScanner({
+    this.portScanManager = new PortScanManager({
       eventEmitter: this.eventEmitter
     });
 
@@ -89,11 +85,11 @@ class NetworkScanner {
       this.on("scan-port:start", ({ ip, port }) =>
         this.log("ports", `Check Port //${ip}:${port}`)
       );
-      this.on(
-        "scan-port:end",
-        ({ ip, port, open }) =>
-          open && this.log("ports", `Open Port: //${ip}:${port}`)
-      );
+      this.on("scan-port:end", ({ ip, port, open }) => {
+        if (open) {
+          this.log("ports", `Open Port: //${ip}:${port}, ${open}`);
+        }
+      });
     }
   }
 
@@ -112,7 +108,7 @@ class NetworkScanner {
    * All open ports are added to ip
    */
   scanDevice = async (ip: string, light = true) => {
-    const ports = await this.portScanner.scan(ip, light);
+    const ports = await this.portScanManager.scan(ip, light);
     addPortsToSetMapping(this.ipToPorts, ip, ports);
     this.scannedIps.add(ip);
 
@@ -164,6 +160,7 @@ class NetworkScanner {
 
       this.emit("add-local-range", { range, ip });
       localRanges.add(range);
+      this.gateways.add(range + "1");
     }
 
     localRanges.forEach(range => this.ranges.add(range));
@@ -171,10 +168,15 @@ class NetworkScanner {
   };
 
   scanNetwork = async () => {
+    // const ips = await getIps();
+    // for (const ip of ips) {
+    //   await this.scanDevice(ip, false);
+    // }
+
     await this.addLocalRanges();
     await this.testGateways(true);
 
-    // Usually doing awaits inside a loop is extremely inefficient but in this case we want
+    // Usually doing awaits inside a loop is inefficient but in this case we want
     // to sequentially scan them.
 
     /* eslint-disable no-await-in-loop */

@@ -1,17 +1,24 @@
 import EventEmitter from "events";
 
 import { commonHttpPorts, commonPorts } from "./PortDump";
+import PortScanner from "./port-scanner/PortScanner";
+import ImagePortScanner from "./port-scanner/ImagePortScanner";
+import XMLHttpRequestScanner from "./port-scanner/XMLHttpRequestPortScanner";
+import FetchPortScanner from "./port-scanner/FetchPortScanner";
+import HybridFetchPortScanner from "./port-scanner/HybridFetchPortScanner";
 
-class PortScanner {
+class PortScanManager {
   eventEmitter: EventEmitter;
 
-  imgs: HTMLImageElement[];
+  portScanners: PortScanner[];
 
   constructor({ eventEmitter }: { eventEmitter: EventEmitter }) {
     this.eventEmitter = eventEmitter;
 
     //initialize image pool
-    this.imgs = new Array(10).fill(null).map(() => new Image());
+    /*this.portScanners = new Array(50)
+      .fill(null)
+      .map(() => new XMLHttpRequestScanner());*/
   }
 
   /**
@@ -50,7 +57,7 @@ class PortScanner {
   }
 
   // eslint-disable-next-line no-console
-  async scanPorts(ports: number[], target: string) {
+  async scanPorts(ports: number[], target: string, timeout = 500) {
     const openPorts: number[] = [];
     const tmpPorts = [...ports];
 
@@ -58,8 +65,13 @@ class PortScanner {
     while (tmpPorts.length > 0) {
       const results = await Promise.all(
         tmpPorts
-          .splice(0, 10)
-          .map((port, index) => this.checkPortUsingImage(index, port, target))
+          .splice(
+            0,
+            10
+          ) /* more than 50 is unreasonable for all browsers, saves some memory */
+          .map((port, index) =>
+            new HybridFetchPortScanner().scan(target, port, timeout, this.emit)
+          )
       );
 
       openPorts.push(...results.filter(port => port !== null));
@@ -68,46 +80,6 @@ class PortScanner {
 
     return openPorts;
   }
-
-  // eslint-disable-next-line no-console
-  checkPortUsingImage(
-    index: number,
-    port: number,
-    target: string,
-    timeout = 500
-  ): Promise<number | null> {
-    if (timeout > 1000) {
-      throw new Error("Timeouts larger than 1000ms shouldn't be used!");
-    }
-
-    return new Promise((resolve, reject) => {
-      this.emit("scan-port:start", { ip: target, port });
-
-      const img = this.imgs[index];
-
-      const callback = () => {
-        if (img.src === "http://localhost/") return;
-        img.src = "http://localhost/";
-
-        this.emit("scan-port:end", { ip: target, port, open: true });
-        resolve(port);
-      };
-
-      img.onerror = callback;
-      img.onload = callback;
-
-      img.src = `http://${target}:${port}`;
-
-      setTimeout(() => {
-        if (img.src === "http://localhost/") return;
-        img.src = "http://localhost/";
-
-        //this.log(`Closed Port: //${target}:${port}`);
-        this.emit("scan-port:end", { ip: target, port, open: false });
-        resolve(null);
-      }, timeout);
-    });
-  }
 }
 
-export default PortScanner;
+export default PortScanManager;
