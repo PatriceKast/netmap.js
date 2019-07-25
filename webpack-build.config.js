@@ -5,6 +5,7 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const context = __dirname;
 
@@ -16,7 +17,7 @@ module.exports = {
   context,
 
   entry: {
-    index: ["@babel/polyfill", path.join(context, "src/index.ts")]
+    index: ["@babel/polyfill", path.join(context, "src/NetworkScanner.ts")]
   },
 
   devtool: "source-map",
@@ -24,7 +25,10 @@ module.exports = {
   output: {
     path: path.join(context, "dist/"),
     filename: "[name].[chunkhash].js",
-    publicPath: PUBLIC_PATH
+    publicPath: PUBLIC_PATH,
+    library: "NetworkScanner", //variable name
+    libraryExport: "default", //what module of the entry above (NetworkScanner.ts) should be used
+    libraryTarget: "var"
   },
 
   optimization: {
@@ -72,6 +76,7 @@ module.exports = {
       generateStatsFile: true
     }),
     new webpack.NoEmitOnErrorsPlugin(),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: "PortScanner Demo",
       template: "index.ejs"

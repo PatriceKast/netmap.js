@@ -1,51 +1,73 @@
-interface Device {
+import DeviceTypes from "./data/devices";
+
+export interface DeviceType {
   name: string;
   ipsuffix?: string;
   ports: Set<number>;
 }
 
-const DeviceTypes: { [key: string]: Device } = {
-  DEFAULT: { name: "Default", ports: new Set() },
-  ROUTER: { name: "Router", ipsuffix: "1", ports: new Set([80, 443]) },
-  SYNOLOGY_NAS: { name: "Synology NAS", ports: new Set([5000, 5001]) },
-  DATABASE: { name: "Database", ports: new Set([3306]) },
-  MAIL: { name: "Mail Server", ports: new Set([25, 110, 143, 465, 587, 993, 995]) },
-  LDAP: { name: "LDAP Server", ports: new Set([389, 636]) },
-  KERBEROS: { name: "Kerberos Server", ports: new Set([88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105]) },
-  AD: { name: "Active Directory", ports: new Set([445]) }
-};
+class Device {
+  ip: string;
+  ports: Set<number>;
+  type: DeviceType;
 
-export const getType = (ip: string, ports: Set<number>) => {
-  for (let type in DeviceTypes) {
-    const device = DeviceTypes[type];
-
-    if (typeof device.ipsuffix !== "undefined") {
-      if (
-        ip.substring(ip.length - device.ipsuffix.length, ip.length) !=
-        device.ipsuffix
-      ) {
-        continue;
-      }
-    }
-
-    let portsMatch = true;
-
-    for (const port of ports) {
-      if (!device.ports.has(port)) {
-        portsMatch = false;
-        break;
-      }
-    }
-
-    if (!portsMatch) {
-      continue;
-    }
-
-    return DeviceTypes[type];
+  constructor(ip: string, ports: Set<number>) {
+    this.ip = ip;
+    this.ports = ports;
+    this.type = Device.getType(ip, ports);
   }
 
-  return DeviceTypes.DEFAULT;
-};
+  static getType = (ip: string, ports: Set<number>) => {
+    let maxScore = 0;
+    let bestMatchingType = "DEFAULT";
+
+    for (let type in DeviceTypes) {
+      const device = DeviceTypes[type];
+      let score = 0;
+
+      if (typeof device.ipsuffix !== "undefined") {
+        if (
+          ip.substring(ip.length - device.ipsuffix.length, ip.length) ===
+          device.ipsuffix
+        ) {
+          score += 10;
+        }
+      }
+
+      for (let port of device.ports) {
+        //these ports are *required* but sysadmins could close them and our scanner doesn't have
+        //a 100% accuracy => relevance search. if less than 50% match, it's not considered anymore
+        //assuming we have a probability of >50% to detect an open port correctly (which we should have),
+        //we expect to detect > half the ports correctly and thus end with a positive score which
+        //is better than the default (0)
+
+        if (ports.has(port)) {
+          score += 1;
+        } else {
+          score -= 1;
+        }
+      }
+
+      //in contrast to ports detected as closed, ports which are detect as being open should always
+      //be correct => monte carlo with one sided error. Having more ports open means
+      //for every additional open port, we also reduce the score by one.
+      for (let port of ports) {
+        if (!device.ports.has(port)) {
+          score -= 1;
+        }
+      }
+
+      if (score > maxScore) {
+        maxScore = score;
+        bestMatchingType = type;
+      }
+    }
+
+    return DeviceTypes[bestMatchingType];
+  };
+}
+
+export default Device;
 
 export const getDeviceArray = (
   ipToPorts: { [key: string]: Set<number> } = {}

@@ -57,8 +57,8 @@ class PortScanManager {
   }
 
   // eslint-disable-next-line no-console
-  async scanPorts(ports: number[], target: string, timeout = 500) {
-    const openPorts: number[] = [];
+  async scanPorts(ports: Set<number>, target: string, timeout = 500) {
+    const openPorts: Set<number> = new Set();
     const tmpPorts = [...ports];
 
     /* eslint-disable no-await-in-loop */
@@ -73,8 +73,9 @@ class PortScanManager {
             new HybridFetchPortScanner().scan(target, port, timeout, this.emit)
           )
       );
-
-      openPorts.push(...results.filter(port => port !== null));
+      results
+        .filter(port => port !== null)
+        .forEach(port => openPorts.add(port));
     }
     /* eslint-enable no-await-in-loop */
 

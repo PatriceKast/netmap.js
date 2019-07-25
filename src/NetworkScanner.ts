@@ -3,18 +3,19 @@ import EventEmitter from "events";
 import PortScanManager from "./PortScanManager";
 import { getIps } from "./IPFetcher";
 import { getRangeFromIp } from "./utilities/network";
+import Device from "./Device";
 
 export type LoggingFunction = (type: string, ...messages: string[]) => void;
 
 const addPortsToSetMapping = (
   setMapping: { [key: string]: Set<number> },
   key: string,
-  items: number[]
+  items: Set<number>
 ) => {
   if (items) {
     //if we already found open ports, add them to the set
     if (setMapping[key]) {
-      items.forEach(item => setMapping[key].add(item));
+      items.forEach(setMapping[key].add);
     } else {
       setMapping[key] = new Set(items);
     }
@@ -30,6 +31,7 @@ class NetworkScanner {
 
   scannedIps: Set<string> = new Set(); //
   ipToPorts: { [key: string]: Set<number> } = {}; //maps all scanned ips to the found ports
+  devices: Set<Device> = new Set();
 
   eventEmitter: EventEmitter;
 
@@ -109,8 +111,14 @@ class NetworkScanner {
    */
   scanDevice = async (ip: string, light = true) => {
     const ports = await this.portScanManager.scan(ip, light);
-    addPortsToSetMapping(this.ipToPorts, ip, ports);
     this.scannedIps.add(ip);
+    addPortsToSetMapping(this.ipToPorts, ip, ports);
+
+    if (ports.size > 0) {
+      const d = new Device(ip, ports);
+      this.devices.add(d);
+      this.emit("add-device", d);
+    }
 
     return ports;
   };
