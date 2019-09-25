@@ -125,4 +125,4 @@ This Project was started by Nico Hauser and Patrice Kast, two Computer Science o
 License
 ----
 
-This program is free software; you may redistribute and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; Version 2 (or later) with the clarifications and exceptions described in the license file. This guarantees your right to use, modify, and redistribute this software under certain conditions.
+Have a look at the [LICENSE](LICENSE) file.
