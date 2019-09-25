@@ -29,7 +29,6 @@ The official releases are hosted on a CDN by KastGroup Gmbh.
 To use this js plugin, add the script to your webpage and create a new netmap.js object:
 
 ```html
-    <!DOCTYPE html>
     <html>
         <head>
             <script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
@@ -47,24 +46,29 @@ Documentation
 
 The following functions are avaible:
 
+```javascript
 	netmap.addLocalRange()            // Adds a custom IP range to the scanning queue
 
 	netmap.scanDevice(ip, light)      // Starts a portscan on a given ip, if light=true only some highly common used ports are tested
 	netmap.scanGateways(ligt)         // Starts a portscan on all possible gateways, if light=true only some highly common used ports are tested
 	netmap.scanRange(range, light)    // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
 	netmap.scanNetwork()              // Autoscan of the full network
+```
 
 The following values are avaible:
 	
+```javascript
 	netmap.scannedIps                 // List of scanned IPs
 	netmap.devices                    // List of found devices
 	netmap.gateways                   // List of scannable gateways
 	netmap.ranges                     // List of scannable ranges
 
 	netmap.eventEmitter               // EventEmitter of netmap.js
+```
 
 The EventEmitter fires on the following signals:
 
+```javascript
 	netmap.eventEmitter.on("scan-port:start", ({ ip, port }) => {});
 	netmap.eventEmitter.on("scan-port:end", ({ ip, port, open }) => {});
 
@@ -77,14 +81,17 @@ The EventEmitter fires on the following signals:
 	netmap.eventEmitter.on("scan-range:start", ({ range, light }) => {});
 	netmap.eventEmitter.on("scan-range:end", ({ range }) => {});
 	netmap.eventEmitter.on("add-local-range", ({ range, ip }) => {});
+```
 
 The Device class has the following values:
 
+```javascript
 	const device = new Device();
 
 	device.ip                         // Get IP of this device
 	device.ports                      // Get a Set of reachable ports
 	device.type                       // DeviceType of this Device
+```
 
 The following DeviceType can be detected:
 
