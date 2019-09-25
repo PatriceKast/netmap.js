@@ -68,7 +68,7 @@ The Device class has the following values:
 	device.type // DeviceType of this Device
 
 The following DeviceType can be detected:
-	```json
+	```javascript
 	{
 	    "DEFAULT": { "name": "Default", "ports": [] },
 	    "ROUTER": { "name": "Router", "ipsuffix": "1", "ports": [80, 443] },
