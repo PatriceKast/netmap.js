@@ -112,3 +112,13 @@ Compatiblity
 ----
 
 The netmap.js plugin is compatible with the following browsers:
+
+Contributors
+----
+
+All code contributions are greatly appreciated. Just clone the Git repository, read the documentation carefully, go through the code yourself and drop us an message if you want to do an push. All pushes should contain logically improvements.
+
+LICENSE
+----
+
+This program is free software; you may redistribute and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; Version 2 (or later) with the clarifications and exceptions described in the license file. This guarantees your right to use, modify, and redistribute this software under certain conditions.
