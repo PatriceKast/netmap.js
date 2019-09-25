@@ -3,6 +3,19 @@
 A small lightweight network scanner, written in javascript.
 netmap.js is an open source penetration testing tool, written in javascript. It tries to scan the local network for open port in different ip ranges and make guesses on the type of device, based on the list of open ports.
 
+Quick Setup
+----
+
+1) Include the following tag in the code of your website:
+``` html
+<script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
+```
+
+2) Instantiate netmap.js
+```javascript
+const netmap = new Netmap();
+```
+
 Demo
 ----
 
@@ -22,7 +35,7 @@ Preferably, you can download netmap.js by cloning the [Git](https://github.com/P
 Usage
 ----
 
-The official releases are hosted on a CDN by KastGroup Gmbh.
+The official releases are hosted on a CDN by KastGroup GmbH.
 
 	https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js
 
