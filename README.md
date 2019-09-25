@@ -6,18 +6,18 @@ netmap.js is an open source penetration testing tool, written in javascript. It 
 Demo
 ----
 
-![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+![Screenshot](https://raw.github.com/PatriceKast/netmap.js/demo/demo.png)
 
-Can be found [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
+Can be found [here](https://raw.github.com/PatriceKast/netmap.js/demo/).
 
 Installation
 ----
 
-You can download the source files or the compiled file by clicking [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
+You can download the source files or the compiled file by clicking [here](https://github.com/PatriceKast/netmap.js/tarball/master).
 
-Preferably, you can download netmap.js by cloning the [Git](https://github.com/sqlmapproject/sqlmap) repository:
+Preferably, you can download netmap.js by cloning the [Git](https://github.com/PatriceKast/netmap.js) repository:
 
-    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev
+    git clone --depth 1 https://github.com/PatriceKast/netmap.js.git sqlmap-dev
 
 Usage
 ----
@@ -46,18 +46,18 @@ The following values are avaible:
 
 The EventEmitter fires on the following signals:
 
-	this.on("scan-port:start", ({ ip, port }) => {});
-	this.on("scan-port:end", ({ ip, port, open }) => {});
+	netmap.eventEmitter.on("scan-port:start", ({ ip, port }) => {});
+	netmap.eventEmitter.on("scan-port:end", ({ ip, port, open }) => {});
 
-	this.on("scan-device:start", ({ ip }) => {});
-	this.on("scan-device:end", ({ ip, duration, ports, portsPerSecond }) => {});
+	netmap.eventEmitter.on("scan-device:start", ({ ip }) => {});
+	netmap.eventEmitter.on("scan-device:end", ({ ip, duration, ports, portsPerSecond }) => {});
 
-	this.on("scan-gateways:start", () => {});
-	this.on("scan-gateways:end", () => {});
+	netmap.eventEmitter.on("scan-gateways:start", () => {});
+	netmap.eventEmitter.on("scan-gateways:end", () => {});
 
-	this.on("scan-range:start", ({ range, light }) => {});
-	this.on("scan-range:end", ({ range }) => {});
-	this.on("add-local-range", ({ range, ip }) => {});
+	netmap.eventEmitter.on("scan-range:start", ({ range, light }) => {});
+	netmap.eventEmitter.on("scan-range:end", ({ range }) => {});
+	netmap.eventEmitter.on("add-local-range", ({ range, ip }) => {});
 
 The Device class has the following values:
 
