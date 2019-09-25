@@ -6,9 +6,9 @@ netmap.js is an open source penetration testing tool, written in javascript. It 
 Demo
 ----
 
-![Screenshot](https://raw.github.com/PatriceKast/netmap.js/demo/demo.png)
+![Screenshot](demo/demo.png)
 
-Can be found [here](https://raw.github.com/PatriceKast/netmap.js/demo/).
+Can be found [here](demo/).
 
 Installation
 ----
@@ -68,6 +68,7 @@ The Device class has the following values:
 	device.type // DeviceType of this Device
 
 The following DeviceType can be detected:
+	```json
 	{
 	    "DEFAULT": { "name": "Default", "ports": [] },
 	    "ROUTER": { "name": "Router", "ipsuffix": "1", "ports": [80, 443] },
@@ -78,7 +79,7 @@ The following DeviceType can be detected:
 		"KERBEROS": { "name": "Kerberos Server", "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105] },
 		"AD": { "name": "Active Directory", "ports": [445] }
 	}
-
+	```
 Compatiblity
 ----
 
