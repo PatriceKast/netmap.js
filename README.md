@@ -28,17 +28,19 @@ The official releases are hosted on a CDN by KastGroup Gmbh.
 
 To use this js plugin, add the script to your webpage and create a new netmap.js object:
 
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
-		</head>
-		<body>
-			<script>
-				const netmap = new Netmap();
-			</script>
-		</body>
-	</html>
+```html
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
+        </head>
+        <body>
+            <script>
+                const netmap = new Netmap();
+            </script>
+        </body>
+    </html>
+```
 
 Documentation
 ----
