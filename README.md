@@ -3,10 +3,12 @@
 A small lightweight network scanner, written in javascript.
 netmap.js is an open source penetration testing tool, written in javascript. It tries to scan the local network for open port in different ip ranges and make guesses on the type of device, based on the list of open ports.
 
-Screenshots
+Demo
 ----
 
 ![Screenshot](https://raw.github.com/wiki/sqlmapproject/sqlmap/images/sqlmap_screenshot.png)
+
+Can be found [here](https://github.com/sqlmapproject/sqlmap/tarball/master).
 
 Installation
 ----
@@ -22,11 +24,60 @@ Usage
 
 To use this js plugin, create a new netmap.js object:
 
-	const nmap = new netmal();
+	const netmap = new Netmap();
 
 The following functions are avaible:
+
+	netmap.addLocalRange()
+
+	netmap.scanDevice(ip, light)      // Starts a portscan on a given ip, if light=true only some highly common used ports are tested
+	netmap.scanGateways(ligt)         // Starts a portscan on all possible gateways, if light=true only some highly common used ports are tested
+	netmap.scanRange(range, light)    // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
+	netmap.scanNetwork()              // Autoscan of the full network
+
+The following values are avaible:
+	
+	netmap.scannedIps     // List of scanned IPs
+	netmap.devices        // List of found devices
+	netmap.gateways       // List of scannable gateways
+	netmap.ranges         // List of scannable ranges
+
+	netmap.eventEmitter   // EventEmitter of netmap.js
+
+The EventEmitter fires on the following signals:
+
+	this.on("scan-port:start", ({ ip, port }) => {});
+	this.on("scan-port:end", ({ ip, port, open }) => {});
+
+	this.on("scan-device:start", ({ ip }) => {});
+	this.on("scan-device:end", ({ ip, duration, ports, portsPerSecond }) => {});
+
+	this.on("scan-gateways:start", () => {});
+	this.on("scan-gateways:end", () => {});
+
+	this.on("scan-range:start", ({ range, light }) => {});
+	this.on("scan-range:end", ({ range }) => {});
+	this.on("add-local-range", ({ range, ip }) => {});
+
+The Device class has the following values:
+
+	const device = new Device();
+
+	device.ip // Get IP of this device
+	device.ports // Get a Set of reachable Ports
+	device.type // DeviceType of this Device
+
+The following DeviceType can be detected:
+    "DEFAULT": { "name": "Default", "ports": [] },
+    "ROUTER": { "name": "Router", "ipsuffix": "1", "ports": [80, 443] },
+	"SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
+	"DATABASE": { "name": "Database", "ports": [3306] },
+	"MAIL": { "name": "Mail Server", "ports": [25, 110, 143, 465, 587, 993, 995] },
+	"LDAP": { "name": "LDAP Server", "ports": [389, 636] },
+	"KERBEROS": { "name": "Kerberos Server", "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105] },
+	"AD": { "name": "Active Directory", "ports": [445] }
 
 Compatiblity
 ----
 
-It is compatible with the following browsers:
+The netmap.js plugin is compatible with the following browsers:

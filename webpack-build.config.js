@@ -17,7 +17,7 @@ module.exports = {
   context,
 
   entry: {
-    index: ["@babel/polyfill", path.join(context, "src/NetworkScanner.ts")]
+    index: ["@babel/polyfill", path.join(context, "src/Netmap.ts")]
   },
 
   devtool: "source-map",
@@ -26,8 +26,8 @@ module.exports = {
     path: path.join(context, "dist/"),
     filename: "[name].[chunkhash].js",
     publicPath: PUBLIC_PATH,
-    library: "NetworkScanner", //variable name
-    libraryExport: "default", //what module of the entry above (NetworkScanner.ts) should be used
+    library: "Netmap", //variable name
+    libraryExport: "default", //what module of the entry above (Netmap.ts) should be used
     libraryTarget: "var"
   },
 
