@@ -171,6 +171,7 @@ Compatiblity
 ----
 
 The netmap.js plugin is compatible with the following browsers:
+The plugin should run in the two latest versions of Chrome, Firefox and Microsoft Edge.
 
 
 Credits
