@@ -3,21 +3,21 @@ import DeviceTypes from "./data/devices";
 export interface DeviceType {
   name: string;
   ipsuffix?: string;
-  ports: Set<number>;
+  ports: number[];
 }
 
 class Device {
   ip: string;
-  ports: Set<number>;
+  ports: number[];
   type: DeviceType;
 
-  constructor(ip: string, ports: Set<number>) {
+  constructor(ip: string, ports: number[]) {
     this.ip = ip;
     this.ports = ports;
     this.type = Device.getType(ip, ports);
   }
 
-  static getType = (ip: string, ports: Set<number>) => {
+  static getType = (ip: string, ports: number[]) => {
     let maxScore = 0;
     let bestMatchingType = "DEFAULT";
 
@@ -41,7 +41,7 @@ class Device {
         //we expect to detect > half the ports correctly and thus end with a positive score which
         //is better than the default (0)
 
-        if (ports.has(port)) {
+        if (ports.includes(port)) {
           score += 1;
         } else {
           score -= 1;
@@ -52,7 +52,7 @@ class Device {
       //be correct => monte carlo with one sided error. Having more ports open means
       //for every additional open port, we also reduce the score by one.
       for (let port of ports) {
-        if (!device.ports.has(port)) {
+        if (!device.ports.includes(port)) {
           score -= 1;
         }
       }
@@ -69,11 +69,9 @@ class Device {
 
 export default Device;
 
-export const getDeviceArray = (
-  ipToPorts: { [key: string]: Set<number> } = {}
-) =>
+export const getDeviceArray = (ipToPorts: { [key: string]: number[] } = {}) =>
   Object.keys(ipToPorts).map(ip => ({
     ip,
     ports: ipToPorts[ip],
-    type: getType(ip, ipToPorts[ip])
+    type: Device.getType(ip, ipToPorts[ip])
   }));
