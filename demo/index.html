@@ -266,7 +266,7 @@
 
 	$("#holder").append('<div class="device dpos1 default"> \
 			<div class="device_img"></div> <h4>This Device</h4> \
-			<sub>IP: ' + /*netmap.portmapper.getIP() + */'</sub> \
+			<sub>IP: 127.0.0.1</sub> \
 		</div>');
 
 	netmap.scanNetwork();
@@ -348,6 +348,7 @@
             clearTimeout(id);
         };
 }());
+
 /*!
  * VERSION: 1.13.1
  * DATE: 2014-07-22
