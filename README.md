@@ -23,19 +23,6 @@ const netmap = new Netmap();
 netmap.scanNetwork();
 ```
 
-Quick Setup
-----
-
-1) Include the following tag in the code of your website:
-``` html
-<script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
-```
-
-2) Instantiate netmap.js
-```javascript
-const netmap = new Netmap();
-```
-
 Demo
 ----
 
