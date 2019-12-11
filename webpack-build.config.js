@@ -24,7 +24,7 @@ module.exports = {
 
   output: {
     path: path.join(context, "dist/"),
-    filename: "[name].[chunkhash].js",
+    filename: "netmap.min.js",
     publicPath: PUBLIC_PATH,
     library: "Netmap", //variable name
     libraryExport: "default", //what module of the entry above (Netmap.ts) should be used
@@ -32,9 +32,6 @@ module.exports = {
   },
 
   optimization: {
-    splitChunks: {
-      chunks: "all"
-    },
     minimize: true,
     minimizer: [
       new UglifyJSPlugin({
