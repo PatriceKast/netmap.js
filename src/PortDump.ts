@@ -24,14 +24,10 @@ const getBrowserString = () =>
     : "Unsupported";
 
 const getCommonPorts = (browser = browserString) =>
-  new Set(
-    unfilteredCommonPorts.filter(x => !restrictedPorts[browser].includes(x))
-  );
+  unfilteredCommonPorts.filter(x => !restrictedPorts[browser].includes(x));
 
 const getCommonHttpPorts = (browser = browserString) =>
-  new Set(
-    unfilteredCommonHttpPorts.filter(x => !restrictedPorts[browser].includes(x))
-  );
+  unfilteredCommonHttpPorts.filter(x => !restrictedPorts[browser].includes(x));
 
 //doesn't change so we can just execute it once on load
 export const browserString = getBrowserString();

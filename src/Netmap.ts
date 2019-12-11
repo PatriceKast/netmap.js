@@ -1,23 +1,24 @@
 import EventEmitter from "events";
 
 import PortScanManager from "./PortScanManager";
-import { getIps } from "./IPFetcher";
-import { getRangeFromIp } from "./utilities/network";
 import Device from "./Device";
+import { commonGateways } from "./data/devices";
+import { commonPorts, commonGatewayPorts } from "./data/ports";
+import { commonRanges } from "./data/ranges";
 
 export type LoggingFunction = (type: string, ...messages: string[]) => void;
 
-const addPortsToSetMapping = (
-  setMapping: { [key: string]: Set<number> },
+const addPortsToArrayMapping = (
+  setMapping: { [key: string]: number[] },
   key: string,
-  items: Set<number>
+  items: number[]
 ) => {
   if (items) {
     //if we already found open ports, add them to the set
     if (setMapping[key]) {
-      items.forEach(setMapping[key].add);
+      items.forEach(item => setMapping[key].push(item));
     } else {
-      setMapping[key] = new Set(items);
+      setMapping[key] = items;
     }
   }
 };
@@ -26,12 +27,13 @@ class Netmap {
   log: LoggingFunction;
   portScanManager: PortScanManager;
 
-  gateways: Set<string>;
-  ranges: Set<string>;
+  gateways: string[];
+  gatewayPorts: number[];
+  detectRanges: string[];
 
-  scannedIps: Set<string> = new Set(); //
-  ipToPorts: { [key: string]: Set<number> } = {}; //maps all scanned ips to the found ports
-  devices: Set<Device> = new Set();
+  scannedIps: string[] = []; //
+  ipToPorts: { [key: string]: number[] } = {}; //maps all scanned ips to the found ports
+  devices: Device[] = [];
 
   eventEmitter: EventEmitter;
 
@@ -41,11 +43,13 @@ class Netmap {
   constructor({
     log = console.log, // eslint-disable-line no-console
     gateways = [],
+    gatewayPorts = [],
     ranges = []
   }) {
     this.log = log;
-    this.gateways = new Set(gateways);
-    this.ranges = new Set(ranges);
+    this.gateways = gateways;
+    this.gatewayPorts = gatewayPorts;
+    this.detectRanges = ranges;
     this.eventEmitter = new EventEmitter();
     this.portScanManager = new PortScanManager({
       eventEmitter: this.eventEmitter
@@ -109,12 +113,12 @@ class Netmap {
    */
   scanDevice = async (ip: string, light = true) => {
     const ports = await this.portScanManager.scan(ip, light);
-    this.scannedIps.add(ip);
-    addPortsToSetMapping(this.ipToPorts, ip, ports);
+    this.scannedIps.push(ip);
+    addPortsToArrayMapping(this.ipToPorts, ip, ports);
 
-    if (ports.size > 0) {
+    if (ports.length > 0) {
       const d = new Device(ip, ports);
-      this.devices.add(d);
+      this.devices.push(d);
       this.emit("add-device", d);
     }
 
@@ -130,7 +134,7 @@ class Netmap {
     for (let i = 0; i < 255; i++) {
       const ip = range + i; //the new ip
 
-      if (!this.scannedIps.has(ip)) {
+      if (!this.scannedIps.includes(ip)) {
         //if not already scanned
         await this.scanDevice(ip, light);
       }
@@ -139,60 +143,46 @@ class Netmap {
 
     this.emit("scan-range:end", { range, light, scannedIps: this.scannedIps });
   };
+  //public methods
 
-  scanGateways = async (light = true) => {
-    // We again want to scan all the gateways sequentially
-    this.emit("scan-gateways:start", { light, gateways: this.gateways });
-
-    /* eslint-disable no-await-in-loop */
-    for (const gateway of this.gateways) {
-      await this.scanDevice(gateway, light);
-    }
-    /* eslint-enable no-await-in-loop */
-
-    this.emit("scan-gateways:end", { light, gateway: this.gateways });
+  addRange = (range: string) => {
+    this.detectRanges.unshift(range);
   };
 
-  addLocalRanges = async () => {
-    this.emit("get-local-ips:start");
-    const ips = await getIps();
-    this.emit("get-local-ips:end", { ips });
-
-    this.emit("add-local-ranges:start");
-    const localRanges = new Set<string>();
-
-    for (const ip of ips) {
-      const range = getRangeFromIp(ip);
-
-      this.emit("add-local-range", { range, ip });
-      localRanges.add(range);
-      this.gateways.add(range + "1");
-    }
-
-    localRanges.forEach(range => this.ranges.add(range));
-    this.emit("add-local-ranges:end", { localRanges });
+  addGateway = (range: string) => {
+    this.gateways.unshift(range);
   };
+
+  addGatewayPort = (port: number) => {
+    this.gatewayPorts.unshift(port);
+  };
+
+  getCommonGateways = () => commonGateways;
+  getCommonGatewayPorts = () => commonGatewayPorts;
+  getCommonRanges = () => commonRanges;
 
   scanNetwork = async () => {
-    // const ips = await getIps();
-    // for (const ip of ips) {
-    //   await this.scanDevice(ip, false);
-    // }
+    const gateways = [...this.gateways, ...commonGateways];
+    const gatewayPorts = [...this.gatewayPorts, ...commonGatewayPorts];
+    const ranges = [...this.detectRanges, ...commonRanges];
 
-    await this.addLocalRanges();
-    await this.scanGateways(true);
+    let foundRange = false;
 
-    // Usually doing awaits inside a loop is inefficient but in this case we want
-    // to sequentially scan them.
-
-    /* eslint-disable no-await-in-loop */
-    for (const range of this.ranges) {
-      await this.scanRange(range, true);
+    for (const gateway of gateways) {
+      for (const range of ranges) {
+        const openPorts = await this.portScanManager.scanPorts(
+          gatewayPorts,
+          range + gateway
+        );
+        if (openPorts.length > 0) {
+          foundRange = true;
+          await this.scanRange(range, true);
+          await this.scanRange(range, false);
+        }
+      }
     }
-    for (const range of this.ranges) {
-      await this.scanRange(range, false);
-    }
-    /* eslint-enable no-await-in-loop */
+
+    return foundRange;
   };
 }
 

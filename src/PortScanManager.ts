@@ -2,9 +2,6 @@ import EventEmitter from "events";
 
 import { commonHttpPorts, commonPorts } from "./PortDump";
 import PortScanner from "./port-scanner/PortScanner";
-import ImagePortScanner from "./port-scanner/ImagePortScanner";
-import XMLHttpRequestScanner from "./port-scanner/XMLHttpRequestPortScanner";
-import FetchPortScanner from "./port-scanner/FetchPortScanner";
 import HybridFetchPortScanner from "./port-scanner/HybridFetchPortScanner";
 
 class PortScanManager {
@@ -57,8 +54,8 @@ class PortScanManager {
   }
 
   // eslint-disable-next-line no-console
-  async scanPorts(ports: Set<number>, target: string, timeout = 500) {
-    const openPorts: Set<number> = new Set();
+  async scanPorts(ports: number[], target: string, timeout = 500) {
+    const openPorts: number[] = [];
     const tmpPorts = [...ports];
 
     /* eslint-disable no-await-in-loop */
@@ -75,7 +72,7 @@ class PortScanManager {
       );
       results
         .filter(port => port !== null)
-        .forEach(port => openPorts.add(port));
+        .forEach(port => openPorts.push(port));
     }
     /* eslint-enable no-await-in-loop */
 
