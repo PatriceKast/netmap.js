@@ -1,4 +1,4 @@
-import NetworkScanner from "./NetworkScanner";
+import NetworkScanner from "./Netmap";
 
 const log = (type, ...args: string[]) => {
   document.write(`${type}: `, ...args);
