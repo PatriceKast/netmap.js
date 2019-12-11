@@ -40,12 +40,19 @@ class Netmap {
   /**
    * Creates a new instance of the class 'netmap'
    */
-  constructor({
-    log = console.log, // eslint-disable-line no-console
-    gateways = [],
-    gatewayPorts = [],
-    ranges = []
-  }) {
+  constructor(
+    {
+      log = console.log, // eslint-disable-line no-console
+      gateways = [],
+      gatewayPorts = [],
+      ranges = []
+    } = {
+      log: console.log, // eslint-disable-line no-console
+      gateways: [],
+      gatewayPorts: [],
+      ranges: []
+    }
+  ) {
     this.log = log;
     this.gateways = gateways;
     this.gatewayPorts = gatewayPorts;

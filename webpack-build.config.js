@@ -71,6 +71,7 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: "disabled",
       generateStatsFile: true
