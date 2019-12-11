@@ -1,10 +1,27 @@
-dev
- netmap.js
+# netmap.js
 
 A small lightweight network scanner, written in javascript.
 netmap.js is an open source penetration testing tool, written in javascript. It tries to detect local ip ranges by identifing gateways in the local network. In case an open port is found, the plugin concentrates the scans on this specific ip range. Additionally it can make guesses on the type of device, based on the list of open ports.
 
 In case an open port is found during range detection phase, the device is saved in the local storage to provide faster gateway detection for the next scan.
+
+Quick Setup
+----
+
+1) Include the following tag in the code of your website:
+``` html
+<script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script>
+```
+
+2) Instantiate netmap.js
+```javascript
+const netmap = new Netmap();
+```
+
+3) Start local ip range detection and performs port scans
+```javascript
+netmap.scanNetwork();
+```
 
 Demo
 ----
@@ -27,7 +44,7 @@ Usage
 
 The official releases are hosted on a CDN by KastGroup GmbH.
 
-	https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js
+    https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js
 
 To use this js plugin, add the script to your webpage and create a new netmap.js object:
 
@@ -39,8 +56,7 @@ To use this js plugin, add the script to your webpage and create a new netmap.js
     <body>
         <script>
             const netmap = new Netmap(console.log);   // Instantiate a new Netmap object
-            netmap.detectRange();                     // Tries to auto detect a local ip range
-            netmap.scanNetwork();                     // Starts portscans on the detected ip ranges
+            netmap.scanNetwork();                     // Start local ip range detection and performs port scans
         </script>
     </body>
 </html>
@@ -55,27 +71,37 @@ The following ranges are defined as default:
     ["192.168.1.", "192.168.1.", ...]
 ```
 
+The following gateway ips (last byte) are defined as default:
+
+```javascript
+    ["1", "11", "64", ...]
+```
+
+The following gateway ports are defined as default:
+
+```javascript
+    ["80", "443", "8080", "8008"]
+```
+
 The following functions are avaible:
 
 ```javascript
 netmap.addRange("192.168.1.")      // Adds a custom IP range to the detection queue
-netmap.addGateways("1")            // Adds a custom gateway (as the fourth byte) to the detection queue
+netmap.addGateways("1")            // Adds a custom gateway (last byte) to the detection queue
 netmap.addGatewayPorts("8008")     // Adds a custom gateway port to the detection queue
 
 netmap.scanDevice(ip, light)       // Starts a portscan on a given ip, if light=true only some highly common used ports are tested
 netmap.scanRange(range, light)     // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
-netmap.detectRange()               // Tries to auto detect a local ip range by testing default gateway ports in each defined range
-netmap.scanNetwork()               // Starts a complete portscans on the detected ip ranges
+netmap.scanNetwork()               // Start local ip range detection and performs port scans on founded rages
 ```
 
 The following values are avaible:
-	
+    
 ```javascript
 netmap.scannedIps                  // List of scanned IPs
 netmap.devices                     // List of found devices
 netmap.gateways                    // List of scannable gateways
 netmap.ranges                      // List of scannable ranges
-
 netmap.eventEmitter                // EventEmitter of netmap.js
 ```
 
@@ -140,4 +166,4 @@ All code contributions are greatly appreciated. Just clone the Git repository, r
 LICENSE
 ----
 
-This program is free software; you may redistribute and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; Version 2 (or later) with the clarifications and exceptions described in the license file. This guarantees your right to use, modify, and redistribute this software under certain conditions.
+Have a look at the [LICENSE](LICENSE) file.
