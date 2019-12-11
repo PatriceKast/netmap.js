@@ -169,7 +169,7 @@
 			background-image: url(https://image.flaticon.com/icons/svg/34/34100.svg);
 			filter: invert(100%);
 		}
-		.radarbox .rooter .device_img {
+		.radarbox .webserver .device_img {
 			background-image: url(https://image.flaticon.com/icons/svg/22/22875.svg);
 			filter: invert(100%);
 		}
@@ -209,9 +209,9 @@
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
-		<div class="device dpos2 rooter">
+		<div class="device dpos2 webserver">
 			<div class="device_img"></div>
-			<h4>Rooter</h4>
+			<h4>webserver</h4>
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
@@ -227,9 +227,9 @@
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
-		<div class="device dpos5 rooter">
+		<div class="device dpos5 webserver">
 			<div class="device_img"></div>
-			<h4>Rooter</h4>
+			<h4>webserver</h4>
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
@@ -245,9 +245,9 @@
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
-		<div class="device dpos8 rooter">
+		<div class="device dpos8 webserver">
 			<div class="device_img"></div>
-			<h4>Rooter</h4>
+			<h4>webserver</h4>
 			<sub>IP: 192.168.1.5</sub>
 			<sub>Ports: 80, 255, 10</sub>
 		</div>
@@ -266,7 +266,7 @@
 
 	$("#holder").append('<div class="device dpos1 default"> \
 			<div class="device_img"></div> <h4>This Device</h4> \
-			<sub>IP: ' + /*netmap.portmapper.getIP() + */'</sub> \
+			<sub>IP: 127.0.0.1</sub> \
 		</div>');
 
 	netmap.scanNetwork();
@@ -348,6 +348,7 @@
             clearTimeout(id);
         };
 }());
+
 /*!
  * VERSION: 1.13.1
  * DATE: 2014-07-22
