@@ -67,10 +67,10 @@ class Netmap {
         this.log("device", `Scanning ip ${ip}`)
       );
 
-      this.on("scan-device:end", ({ ip, duration, ports, portsPerSecond }) =>
+      this.on("scan-device:end", ({ ip, duration, ports, portsPerSecond, res }) =>
         this.log(
           "device",
-          `Done scanning ${ip}. It took ${duration} ms for scanning ${ports.length} ports, ${portsPerSecond} Ports / Sec`
+          `Done scanning ${ip}. It took ${duration} ms for scanning ${ports.length} ports, ${portsPerSecond} Ports / Sec, ${res} open ports found`
         )
       );
 

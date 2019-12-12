@@ -47,7 +47,8 @@ class PortScanManager {
       endTime,
       duration: ms,
       ports,
-      portsPerSecond
+      portsPerSecond,
+      res
     });
 
     return res;
