@@ -24,7 +24,7 @@ module.exports = {
 
   output: {
     path: path.join(context, "dist/"),
-    filename: "netmap.min.js",
+    filename: "netmap.js",
     publicPath: PUBLIC_PATH,
     library: "Netmap", //variable name
     libraryExport: "default", //what module of the entry above (Netmap.ts) should be used
