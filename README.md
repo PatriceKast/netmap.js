@@ -98,7 +98,7 @@ netmap.addGateways("1")            // Adds a custom gateway (last byte) to the d
 netmap.addGatewayPorts("8008")     // Adds a custom gateway port to the detection queue
 
 netmap.scanDevice(ip, light)       // Starts a portscan on a given ip, if light=true only some highly common used ports are tested
-netmap.scanRange(range, light)     // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
+netmap.scanRange("192.168.1.", light)     // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
 netmap.scanNetwork()               // Start local ip range detection and performs port scans on founded rages
 ```
 
@@ -115,6 +115,8 @@ netmap.eventEmitter                // EventEmitter of netmap.js
 The EventEmitter fires on the following signals:
 
 ```javascript
+netmap.eventEmitter.on("add-device", ( device ) => {});
+
 netmap.eventEmitter.on("scan-port:start", ({ ip, port }) => {});
 netmap.eventEmitter.on("scan-port:end", ({ ip, port, open }) => {});
 
