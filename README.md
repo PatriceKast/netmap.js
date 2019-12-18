@@ -145,15 +145,22 @@ The following DeviceType can be detected:
 
 ```json
 {
-    "DEFAULT": { "name": "Default", "ports": [] },
-    "WEBSERVICE": { "name": "Webservice", "ports": [80, 443] },
-    "SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
-    "DATABASE": { "name": "Database", "ports": [3306] },
-    "MAIL": { "name": "Mail Server", "ports": [25, 110, 143, 465, 587, 993, 995] },
-    "LDAP": { "name": "LDAP Server", "ports": [389, 636] },
-    "KERBEROS": { "name": "Kerberos Server", "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105] },
-    "AD": { "name": "Active Directory", "ports": [445] }
+  "SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
+  "DATABASE": { "name": "Database", "ports": [3306] },
+  "MAIL": {
+    "name": "Mail Server",
+    "ports": [25, 110, 143, 465, 587, 993, 995]
+  },
+  "LDAP": { "name": "LDAP Server", "ports": [389, 636] },
+  "KERBEROS": {
+    "name": "Kerberos Server",
+    "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105]
+  },
+  "AD": { "name": "Active Directory", "ports": [445] },
+  "WEBSERVER": { "name": "Webserver", "ports": [80, 443] },
+  "DEFAULT": { "name": "Default", "ports": [] }
 }
+
 ```
 
 Compatiblity
