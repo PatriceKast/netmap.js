@@ -8,22 +8,7 @@
   "LDAP": { "name": "LDAP Server", "ports": [389, 636] },
   "KERBEROS": {
     "name": "Kerberos Server",
-    "ports": [
-      88,
-      464,
-      543,
-      544,
-      749,
-      750,
-      751,
-      752,
-      753,
-      754,
-      760,
-      1109,
-      2053,
-      2105
-    ]
+    "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105]
   },
   "AD": { "name": "Active Directory", "ports": [445] },
   "WEBSERVER": { "name": "Webserver", "ports": [80, 443] },
