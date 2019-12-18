@@ -98,7 +98,7 @@ netmap.addGateways("1")            // Adds a custom gateway (last byte) to the d
 netmap.addGatewayPorts("8008")     // Adds a custom gateway port to the detection queue
 
 netmap.scanDevice(ip, light)       // Starts a portscan on a given ip, if light=true only some highly common used ports are tested
-netmap.scanRange(range, light)     // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
+netmap.scanRange("192.168.1.", light)     // Starts a portscan on a given ip range, if light=true only some highly common used ports are tested
 netmap.scanNetwork()               // Start local ip range detection and performs port scans on founded rages
 ```
 
@@ -115,6 +115,8 @@ netmap.eventEmitter                // EventEmitter of netmap.js
 The EventEmitter fires on the following signals:
 
 ```javascript
+netmap.eventEmitter.on("add-device", ( device ) => {});
+
 netmap.eventEmitter.on("scan-port:start", ({ ip, port }) => {});
 netmap.eventEmitter.on("scan-port:end", ({ ip, port, open }) => {});
 
@@ -143,15 +145,22 @@ The following DeviceType can be detected:
 
 ```json
 {
-    "DEFAULT": { "name": "Default", "ports": [] },
-    "WEBSERVICE": { "name": "Webservice", "ports": [80, 443] },
-    "SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
-    "DATABASE": { "name": "Database", "ports": [3306] },
-    "MAIL": { "name": "Mail Server", "ports": [25, 110, 143, 465, 587, 993, 995] },
-    "LDAP": { "name": "LDAP Server", "ports": [389, 636] },
-    "KERBEROS": { "name": "Kerberos Server", "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105] },
-    "AD": { "name": "Active Directory", "ports": [445] }
+  "SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
+  "DATABASE": { "name": "Database", "ports": [3306] },
+  "MAIL": {
+    "name": "Mail Server",
+    "ports": [25, 110, 143, 465, 587, 993, 995]
+  },
+  "LDAP": { "name": "LDAP Server", "ports": [389, 636] },
+  "KERBEROS": {
+    "name": "Kerberos Server",
+    "ports": [88, 464, 543, 544, 749, 750, 751, 752, 753, 754, 760, 1109, 2053, 2105]
+  },
+  "AD": { "name": "Active Directory", "ports": [445] },
+  "WEBSERVER": { "name": "Webserver", "ports": [80, 443] },
+  "DEFAULT": { "name": "Default", "ports": [] }
 }
+
 ```
 
 Compatiblity
