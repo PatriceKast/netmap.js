@@ -4,7 +4,7 @@
 	<title>netmap.js Demo</title>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<!-- <script type="text/javascript" src="https://cdn.kastgroup.com/js/libs/netmap.js/1.0.0/netmap.min.js"></script> -->
-	<script type="text/javascript" src="../dist/netmap.min.js"></script>
+	<script type="text/javascript" src="../dist/netmap.js"></script>
 
 	<style type="text/css">
 		*{
@@ -218,8 +218,16 @@
 
 	netmap.eventEmitter.on("scan-device:end", ({ ip, duration, ports, portsPerSecond, res }) => {
         if(res.length != 0) {
-        	$("#holder").append('<div class="device dpos' + place + ' database"> \
-				<div class="device_img"></div> <h4>Database</h4> \
+        	let name = "Default";
+        	alert(netmap.devices.length);
+        	for(let i = 0; i < netmap.devices.length; i ++) {
+        		if(netmap.devices[i].ip == ip) {
+        			name = netmap.devices[i].type.name;
+        		}
+        	}
+
+        	$("#holder").append('<div class="device dpos' + place + ' ' + name.toLowerCase() + '"> \
+				<div class="device_img"></div> <h4>' + name + '</h4> \
 				<sub>IP: ' + ip + '</sub> \
 				<sub>Ports: ' + res.join(", ") + '</sub> \
 			</div>');

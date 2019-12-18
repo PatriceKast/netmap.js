@@ -1,6 +1,4 @@
 {
-  "DEFAULT": { "name": "Default", "ports": [] },
-  "WEBSERVER": { "name": "Webserver", "ports": [80, 443] },
   "SYNOLOGY_NAS": { "name": "Synology NAS", "ports": [5000, 5001] },
   "DATABASE": { "name": "Database", "ports": [3306] },
   "MAIL": {
@@ -27,5 +25,7 @@
       2105
     ]
   },
-  "AD": { "name": "Active Directory", "ports": [445] }
+  "AD": { "name": "Active Directory", "ports": [445] },
+  "WEBSERVER": { "name": "Webserver", "ports": [80, 443] },
+  "DEFAULT": { "name": "Default", "ports": [] }
 }
