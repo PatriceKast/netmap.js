@@ -28,7 +28,7 @@ Demo
 
 ![Screenshot](demo/demo.png)
 
-A sample application of the netmap.js plugin can be found [here](demo/).
+A sample application of the netmap.js plugin can be found [here](https://patricekast.github.io/netmap.js/demo/).
 
 Installation
 ----
